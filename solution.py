@@ -5,6 +5,7 @@ import struct
 import time
 import select
 import binascii
+import statistics
 
 # Should use stdev
 
@@ -126,10 +127,13 @@ def ping(host, timeout=1):
 
     print("Ping Statistics for", dest)
     avg_time = sum(pingtime) / len(pingtime)
-    print("\tMax. = {}ms, Min. = {}ms, Avg. = {}ms".format(max(pingtime), min(pingtime), avg_time))
+    print("\tMin. = {}ms, Avg. = {}ms, Max. = {}ms, Std. Dev. = {}ms".format((round(min(pingtime),2)),
+                                                                             (round(avg_time,2)),
+                                                                             (round(max(pingtime),2)),
+                                                                             (round(statistics.stdev(pingtime),2))))
 
     vars = [str(round(max(pingtime),2)), str(round(min(pingtime),2)), str(round((avg_time),2))]
-    
+
     return vars
 
 if __name__ == '__main__':
