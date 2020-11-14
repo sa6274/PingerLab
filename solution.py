@@ -118,7 +118,7 @@ def ping(host, timeout=1):
     for i in range(4):
         try:
             delay, size = doOnePing(dest, timeout)
-            print("Reply from {}: time={}".format(dest, (round(min(delay),2))))
+            print("Reply from {}: time={}".format(dest, str(round(delay, 2))))
             pingtime.append(delay)
             time.sleep(1)  # one second
         except Exception:
