@@ -46,6 +46,7 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
 
         timeReceived = time.time()
         recPacket, addr = mySocket.recvfrom(1024)
+        size = sys.getsizeof(recPacket)
 
         # Fill in start
         # Fetch the ICMP header from the IP packet
@@ -54,14 +55,14 @@ def receiveOnePing(mySocket, ID, timeout, destAddr):
         if ICMPId == ID:  # type should be 0
             bytes_double = struct.calcsize("d")
             timeSent = struct.unpack("d", recPacket[28: 28 + bytes_double])[0]
-            return timeReceived - timeSent
+            return timeReceived - timeSent, size
         else:
             return 'Request Timeout'
 
         # Fill in end
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
-            return "Request timed out."
+            return "Request timed out.", size
 
 
 def sendOnePing(mySocket, destAddr, ID):
@@ -89,7 +90,6 @@ def sendOnePing(mySocket, destAddr, ID):
     # Both LISTS and TUPLES consist of a number of objects
     # which can be referenced by their position number within the object.
 
-
 def doOnePing(destAddr, timeout):
     icmp = getprotobyname("icmp")
 
@@ -108,16 +108,29 @@ def ping(host, timeout=1):
     dest = gethostbyname(host)
     print("Pinging " + dest + " using Python:")
     print("")
+    pingtime = []
+    packetloss = 0
+
     # Calculate vars values and return them
     #  vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
     # Send ping requests to a server separated by approximately one second
-    for i in range(0, 4):
-        delay = doOnePing(dest, timeout)
-        print(delay)
-        time.sleep(1)  # one second
+    for i in range(4):
+        try:
+            delay, size = doOnePing(dest, timeout)
+            print("Reply from {}: time={}".format(dest, delay))
+            pingtime.append(delay)
+            time.sleep(1)  # one second
+        except Exception:
+            packetloss += 1
+            print("Request timeout")
 
+    print("Ping Statistics for", dest)
+    avg_time = sum(pingtime) / len(pingtime)
+    print("\tMax. = {}ms, Min. = {}ms, Avg. = {}ms".format(max(pingtime), min(pingtime), avg_time))
+
+    vars = [str(round(max(pingtime),2)), str(round(min(pingtime),2)), str(round((avg_time),2))]
+    
     return vars
-
 
 if __name__ == '__main__':
     ping("google.co.il")
