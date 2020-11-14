@@ -113,7 +113,7 @@ def ping(host, timeout=1):
     packetloss = 0
 
     # Calculate vars values and return them
-    #  vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
+    #vars = [str(round(packet_min, 2)), str(round(packet_avg, 2)), str(round(packet_max, 2)),str(round(stdev(stdev_var), 2))]
     # Send ping requests to a server separated by approximately one second
     for i in range(4):
         try:
